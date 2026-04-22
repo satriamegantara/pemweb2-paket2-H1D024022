@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-700">
     @php
         $user = auth()->user();
         $role = $user?->role;
@@ -18,7 +18,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center gap-2">
                         <x-application-logo class="block h-8 w-auto fill-current text-primary" />
-                        <span class="font-semibold text-gray-900">UMKMart</span>
+                        <span class="font-semibold text-gray-900 dark:text-gray-100">UMKMart</span>
                     </a>
                 </div>
 
@@ -71,14 +71,19 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <!-- Dark Mode Toggle -->
+                <div class="me-4">
+                    <x-dark-mode-toggle />
+                </div>
+
                 @auth
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:text-gray-400 dark:bg-gray-800 dark:hover:text-gray-200">
                                 <div class="text-left">
-                                    <div class="text-sm font-medium text-gray-700 leading-4">{{ $user->name }}</div>
-                                    <div class="text-xs text-gray-500 leading-4">{{ $user->role }}</div>
+                                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 leading-4">{{ $user->name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-500 leading-4">{{ $user->role }}</div>
                                 </div>
 
                                 <div class="ms-2">
@@ -110,7 +115,7 @@
                     </x-dropdown>
                 @else
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-gray-900 underline">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-gray-900 underline dark:text-gray-400 dark:hover:text-gray-100">
                             {{ __('Login') }}
                         </a>
                         <a href="{{ route('register') }}"
@@ -138,7 +143,7 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white dark:bg-gray-900">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 {{ __('Katalog') }}
@@ -185,11 +190,11 @@
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
             @auth
                 <div class="px-4">
-                    <div class="font-medium text-base text-gray-800">{{ $user->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ $user->email }}</div>
+                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ $user->name }}</div>
+                    <div class="font-medium text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
                 </div>
 
                 <div class="mt-3 space-y-1">

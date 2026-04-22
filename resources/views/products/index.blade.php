@@ -1,25 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-200">
             {{ __('Katalog Produk') }}
         </h2>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white shadow-sm sm:rounded-lg p-6 dark:bg-gray-800">
                 <form method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-6">
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Search') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Search') }}</label>
                         <input name="q" value="{{ $search }}"
-                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             placeholder="Cari produk..." />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Kategori') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Kategori') }}</label>
                         <select name="category"
-                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             <option value="">{{ __('Semua') }}</option>
                             @foreach ($categories as $cat)
                                 <option value="{{ $cat->id }}" @selected((string) $categoryId === (string) $cat->id)>
@@ -29,23 +29,23 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Min Harga') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Min Harga') }}</label>
                         <input name="min_price" inputmode="numeric" value="{{ $minPrice }}"
-                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             placeholder="0" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Max Harga') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Max Harga') }}</label>
                         <input name="max_price" inputmode="numeric" value="{{ $maxPrice }}"
-                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             placeholder="100000" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Sort') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Sort') }}</label>
                         <select name="sort"
-                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             <option value="latest" @selected($sort === 'latest')>{{ __('Terbaru') }}</option>
                             <option value="price_asc" @selected($sort === 'price_asc')>{{ __('Harga termurah') }}</option>
                             <option value="price_desc" @selected($sort === 'price_desc')>{{ __('Harga termahal') }}
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="md:col-span-6 flex flex-wrap items-center gap-3">
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <input type="checkbox" name="in_stock" value="1"
                                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                 @checked((bool) $inStock)>
@@ -62,11 +62,11 @@
                         </label>
 
                         <button
-                            class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                            class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 dark:bg-primary dark:hover:bg-primary-600">
                             {{ __('Terapkan') }}
                         </button>
                         <a href="{{ route('products.index') }}"
-                            class="text-sm text-gray-600 hover:text-gray-900 underline">
+                            class="text-sm text-gray-600 hover:text-gray-900 underline dark:text-gray-400 dark:hover:text-gray-200">
                             {{ __('Reset') }}
                         </a>
                         <a href="{{ route('cart.index') }}"
@@ -80,27 +80,27 @@
             <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
                 @php($img = $product->images->firstWhere('is_primary', true) ?? $product->images->first())
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800">
                     <a href="{{ route('products.show', $product) }}" class="block">
                         @if ($img)
                             <img src="{{ asset('storage/' . $img->image_path) }}"
                                 class="h-36 w-full object-cover lg:h-32 xl:h-36" alt="Product image">
                         @else
                             <div
-                                class="flex h-36 w-full items-center justify-center bg-gray-100 text-sm text-gray-500 lg:h-32 xl:h-36">
+                                class="flex h-36 w-full items-center justify-center bg-gray-100 text-sm text-gray-500 lg:h-32 xl:h-36 dark:bg-gray-700 dark:text-gray-400">
                                 No image</div>
                         @endif
                     </a>
                     <div class="p-4">
                         <a href="{{ route('products.show', $product) }}"
-                            class="text-sm font-semibold text-gray-900 hover:text-indigo-600 lg:text-base">
+                            class="text-sm font-semibold text-gray-900 hover:text-indigo-600 lg:text-base dark:text-gray-100 dark:hover:text-primary">
                             {{ $product->name }}
                         </a>
-                        <div class="mt-1 text-xs text-gray-600 lg:text-sm">
+                        <div class="mt-1 text-xs text-gray-600 lg:text-sm dark:text-gray-400">
                             {{ $product->category?->name }}
                         </div>
                         <div class="mt-3 flex items-center justify-between gap-2">
-                            <div class="text-sm font-semibold text-gray-900 lg:text-base">
+                            <div class="text-sm font-semibold text-gray-900 lg:text-base dark:text-gray-100">
                                 Rp {{ number_format((float) $product->price, 0, ',', '.') }}
                             </div>
                             <form method="POST" action="{{ route('cart.add', $product) }}">
@@ -112,13 +112,13 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="mt-2 text-[11px] text-gray-500 lg:text-xs">
+                        <div class="mt-2 text-[11px] text-gray-500 lg:text-xs dark:text-gray-500">
                             Stok: {{ $product->stock }}
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="text-sm text-gray-500">
+                <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ __('Tidak ada produk.') }}
                 </div>
                 @endforelse

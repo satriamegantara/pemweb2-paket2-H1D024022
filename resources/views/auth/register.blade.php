@@ -19,7 +19,7 @@
         <!-- Role -->
         <div class="mt-4">
             <x-input-label for="role" :value="__('Daftar sebagai')" />
-            <select id="role" name="role" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <select id="role" name="role" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary">
                 <option value="pembeli" @selected(old('role', 'pembeli') === 'pembeli')>{{ __('Pembeli') }}</option>
                 <option value="penjual" @selected(old('role') === 'penjual')>{{ __('Penjual UMKM') }}</option>
             </select>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:text-gray-400 dark:hover:text-gray-200" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 

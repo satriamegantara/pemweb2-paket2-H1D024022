@@ -17,13 +17,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-white">
+<body class="font-sans antialiased dark:bg-gray-900 dark:text-gray-100">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
         @isset($header)
-            <header class="bg-white shadow">
+            <header class="bg-white shadow dark:bg-gray-800 dark:shadow-gray-700">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
@@ -34,16 +34,16 @@
         <main>
             @if (session('success'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    <div class="rounded-md bg-primary-50 p-4">
-                        <p class="text-sm font-medium text-primary">{{ session('success') }}</p>
+                    <div class="rounded-md bg-primary-50 p-4 dark:bg-primary-900/30">
+                        <p class="text-sm font-medium text-primary dark:text-primary-400">{{ session('success') }}</p>
                     </div>
                 </div>
             @endif
 
             @if (session('error'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    <div class="rounded-md bg-red-50 p-4">
-                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                    <div class="rounded-md bg-red-50 p-4 dark:bg-red-900/30">
+                        <p class="text-sm font-medium text-red-800 dark:text-red-400">{{ session('error') }}</p>
                     </div>
                 </div>
             @endif

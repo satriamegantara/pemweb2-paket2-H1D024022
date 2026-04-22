@@ -26,4 +26,4 @@ COPY . .
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 EXPOSE 8080
-CMD php artisan config:clear && php artisan serve --host=0.0.0.0 --port=8080
+CMD php -S 0.0.0.0:8080 -t public

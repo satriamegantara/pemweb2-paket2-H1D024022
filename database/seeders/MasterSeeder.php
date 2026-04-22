@@ -3,234 +3,238 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Store;
 use App\Models\User;
-use App\Traits\GeneratesSlug;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class MasterSeeder extends Seeder
 {
-    use GeneratesSlug;
     public function run(): void
     {
-        Storage::disk('public')->makeDirectory('seed');
+        // === USERS ===
 
-        $this->seedPlaceholderImages();
+        $admin1 = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => 'admin',
+            'phone' => '08123456789',
+            'address' => 'Jl. Admin No. 1',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@umkmart.test'],
-            [
-                'name' => 'Admin UMKMart',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'phone' => '080000000000',
-                'address' => 'Alamat admin (seed)',
-            ]
-        );
+        $penjual2 = User::create([
+            'name' => 'Penjual',
+            'email' => 'seller@example.com',
+            'role' => 'penjual',
+            'phone' => '08987654321',
+            'address' => 'Jl. Seller No. 2',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
 
-        $buyer = User::firstOrCreate(
-            ['email' => 'buyer@umkmart.test'],
-            [
-                'name' => 'Pembeli Demo',
-                'password' => Hash::make('password'),
-                'role' => 'pembeli',
-                'phone' => '081111111111',
-                'address' => 'Alamat pembeli (seed)',
-            ]
-        );
+        $pembeli3 = User::create([
+            'name' => 'Pembeli',
+            'email' => 'buyer@example.com',
+            'role' => 'pembeli',
+            'phone' => '08555555555',
+            'address' => 'Jl. Buyer No. 3',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
 
-        $seller1 = User::firstOrCreate(
-            ['email' => 'seller1@umkmart.test'],
-            [
-                'name' => 'Penjual Demo 1',
-                'password' => Hash::make('password'),
-                'role' => 'penjual',
-                'phone' => '082222222222',
-                'address' => 'Alamat penjual 1 (seed)',
-            ]
-        );
+        $penjual4 = User::create([
+            'name' => 'Wisnu Bodo',
+            'email' => 'seller1@example.com',
+            'role' => 'penjual',
+            'phone' => '',
+            'address' => '',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
 
-        $seller2 = User::firstOrCreate(
-            ['email' => 'seller2@umkmart.test'],
-            [
-                'name' => 'Penjual Demo 2',
-                'password' => Hash::make('password'),
-                'role' => 'penjual',
-                'phone' => '083333333333',
-                'address' => 'Alamat penjual 2 (seed)',
-            ]
-        );
+        $penjual5 = User::create([
+            'name' => 'Yusuf Zawawi',
+            'email' => 'seller2@example.com',
+            'role' => 'penjual',
+            'phone' => '',
+            'address' => '',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
 
-        $store1 = Store::firstOrCreate(
-            ['user_id' => $seller1->id],
-            [
-                'store_name' => 'Toko Demo 1',
-                'description' => 'Deskripsi toko demo 1',
-                'address' => 'Alamat toko demo 1',
-            ]
-        );
+        // === STORES ===
 
-        $store2 = Store::firstOrCreate(
-            ['user_id' => $seller2->id],
-            [
-                'store_name' => 'Toko Demo 2',
-                'description' => 'Deskripsi toko demo 2',
-                'address' => 'Alamat toko demo 2',
-            ]
-        );
+        $store1 = Store::create([
+            'user_id' => $penjual2->id,
+            'store_name' => 'Robotech Planes',
+            'description' => 'Toko yang berfokus pada teknologi khususnya UAV',
+            'logo' => '',
+            'address' => 'Surabaya',
+        ]);
 
-        $categories = collect([
-            ['name' => 'Makanan', 'icon' => '🍱'],
-            ['name' => 'Minuman', 'icon' => '🥤'],
-            ['name' => 'Kerajinan', 'icon' => '🧶'],
-        ])->map(function (array $row) {
-            $slug = self::generateUniqueSlug(new Category(), $row['name']);
+        $store2 = Store::create([
+            'user_id' => $penjual4->id,
+            'store_name' => 'Buaya AeroTech',
+            'description' => 'Perusahaan yang bergerak di bidang teknologi khususnya komponen UAV',
+            'logo' => '',
+            'address' => 'Yogyakarta',
+        ]);
 
-            return Category::firstOrCreate(['slug' => $slug], [
-                'name' => $row['name'],
-                'icon' => $row['icon'],
-            ]);
-        });
+        $store3 = Store::create([
+            'user_id' => $penjual5->id,
+            'store_name' => 'Toko Kelontong',
+            'description' => '',
+            'logo' => '',
+            'address' => 'Jakarta',
+        ]);
 
-        $catFood = $categories->firstWhere('name', 'Makanan');
-        $catDrink = $categories->firstWhere('name', 'Minuman');
-        $catCraft = $categories->firstWhere('name', 'Kerajinan');
+        // === CATEGORIES ===
 
-        $productA = $this->seedProduct($store1->id, $catFood->id, 'Keripik Singkong Pedas', 15000, 50);
-        $productB = $this->seedProduct($store2->id, $catDrink->id, 'Es Teh Botol UMKM', 5000, 80);
-        $productC = $this->seedProduct($store1->id, $catCraft->id, 'Tas Rajut Handmade', 75000, 15);
+        $catMakanan = Category::create([
+            'name' => 'Makanan',
+            'slug' => 'makanan',
+            'icon' => '🍔',
+        ]);
 
-        $this->seedProductImages($productA->id);
-        $this->seedProductImages($productB->id);
-        $this->seedProductImages($productC->id);
+        $catMinuman = Category::create([
+            'name' => 'Minuman',
+            'slug' => 'minuman',
+            'icon' => '🥤',
+        ]);
 
-        $this->seedSampleOrderMultiSeller($buyer->id, [$productA, $productB]);
-    }
+        $catKerajinan = Category::create([
+            'name' => 'Kerajinan',
+            'slug' => 'kerajinan',
+            'icon' => '✂️',
+        ]);
 
-    private function seedProduct(int $storeId, int $categoryId, string $name, float $price, int $stock): Product
-    {
-        $slug = self::generateUniqueSlug(new Product(), $name, withTrashed: true);
+        $catTeknologi = Category::create([
+            'name' => 'Teknologi',
+            'slug' => 'teknologi',
+            'icon' => '🤖',
+        ]);
 
-        return Product::firstOrCreate(['slug' => $slug], [
-            'store_id' => $storeId,
-            'category_id' => $categoryId,
-            'name' => $name,
-            'description' => "Produk demo: {$name}",
-            'price' => $price,
-            'stock' => $stock,
-            'weight' => 500,
+        // === PRODUCTS ===
+
+        $product1 = Product::create([
+            'store_id' => $store1->id,
+            'category_id' => $catTeknologi->id,
+            'primary_image_id' => null,
+            'name' => 'Bimark Racing Plane',
+            'slug' => 'bimark-racing-plane-2',
+            'description' => '',
+            'price' => '10000000.00',
+            'stock' => 1,
+            'weight' => 3000,
             'is_active' => true,
         ]);
-    }
 
-    private function seedPlaceholderImages(): void
-    {
-        $placeholders = [
-            'seed/product-1.svg' => '#4F46E5',
-            'seed/product-2.svg' => '#16A34A',
-            'seed/product-3.svg' => '#DC2626',
-        ];
+        ProductImage::create([
+            'product_id' => $product1->id,
+            'image_path' => 'products/3/EG00n5VzJfJtQtGKfM9cTtvwN4U3A8Cb4frRmltc.png',
+            'is_primary' => false,
+        ]);
+        ProductImage::create([
+            'product_id' => $product1->id,
+            'image_path' => 'products/3/BpBJx7U6XgMuQzGtvHfUeXhFIIlt4GW3igaiwEgK.png',
+            'is_primary' => true,
+        ]);
+        ProductImage::create([
+            'product_id' => $product1->id,
+            'image_path' => 'products/3/0kQo169NfUfJqfXq5NsrwWRCCE99gpGVCV6CX0zC.png',
+            'is_primary' => false,
+        ]);
 
-        foreach ($placeholders as $path => $color) {
-            if (Storage::disk('public')->exists($path)) {
-                continue;
-            }
+        $product2 = Product::create([
+            'store_id' => $store2->id,
+            'category_id' => $catMakanan->id,
+            'primary_image_id' => null,
+            'name' => 'Pegasus Racing Plane',
+            'slug' => 'pegasus-racing-plane',
+            'description' => '',
+            'price' => '12000000.00',
+            'stock' => 1,
+            'weight' => 3020,
+            'is_active' => true,
+        ]);
 
-            $svg = <<<SVG
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
-  <rect width="100%" height="100%" fill="{$color}"/>
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-size="32" font-family="Arial, sans-serif">
-    UMKMart
-  </text>
-</svg>
-SVG;
+        ProductImage::create([
+            'product_id' => $product2->id,
+            'image_path' => 'products/4/iVJfJ6Zaj8UhvurPZH5P87diKoDNdSzzuURmKUT2.png',
+            'is_primary' => true,
+        ]);
+        ProductImage::create([
+            'product_id' => $product2->id,
+            'image_path' => 'products/4/YiB6gsODq1mKgxXZDvEidZV7QeVfnlHLxJmr85JG.png',
+            'is_primary' => false,
+        ]);
+        ProductImage::create([
+            'product_id' => $product2->id,
+            'image_path' => 'products/4/dT0TyKPAKWHAP4hsCfEUTgy6WTg4uTrhQmbzV90D.png',
+            'is_primary' => false,
+        ]);
 
-            Storage::disk('public')->put($path, $svg);
-        }
-    }
+        $product3 = Product::create([
+            'store_id' => $store2->id,
+            'category_id' => $catKerajinan->id,
+            'primary_image_id' => null,
+            'name' => 'Gen1 Racing Plane',
+            'slug' => 'gen1-racing-plane',
+            'description' => '',
+            'price' => '9500000.00',
+            'stock' => 1,
+            'weight' => 2900,
+            'is_active' => true,
+        ]);
 
-    private function seedProductImages(int $productId): void
-    {
-        if (ProductImage::where('product_id', $productId)->count() >= 3) {
-            return;
-        }
+        ProductImage::create([
+            'product_id' => $product3->id,
+            'image_path' => 'products/5/nH6JZY8w32192dEuiq83Bpd7mLW0zde8XrFHjGc7.png',
+            'is_primary' => true,
+        ]);
+        ProductImage::create([
+            'product_id' => $product3->id,
+            'image_path' => 'products/5/9vQlfKTK1SMm5sQGClwy2hb55CTin9JJFyAxWq7T.png',
+            'is_primary' => false,
+        ]);
+        ProductImage::create([
+            'product_id' => $product3->id,
+            'image_path' => 'products/5/vZJqGLKKm1WTeYC8sdqIhAeCA8OnSQsrOI6pBHvq.png',
+            'is_primary' => false,
+        ]);
 
-        $paths = [
-            'seed/product-1.svg',
-            'seed/product-2.svg',
-            'seed/product-3.svg',
-        ];
+        $product4 = Product::create([
+            'store_id' => $store3->id,
+            'category_id' => $catKerajinan->id,
+            'primary_image_id' => null,
+            'name' => 'Gelang Karet',
+            'slug' => 'gelang-karet',
+            'description' => '',
+            'price' => '10000.00',
+            'stock' => 0,
+            'weight' => 300,
+            'is_active' => true,
+        ]);
 
-        foreach ($paths as $idx => $path) {
-            ProductImage::create([
-                'product_id' => $productId,
-                'image_path' => $path,
-                'is_primary' => $idx === 0,
-            ]);
-        }
-    }
+        ProductImage::create([
+            'product_id' => $product4->id,
+            'image_path' => 'products/6/MjiNu26FKyY8gdj42rBk0rBo6kYXFbnW70SC3a4j.png',
+            'is_primary' => true,
+        ]);
+        ProductImage::create([
+            'product_id' => $product4->id,
+            'image_path' => 'products/6/I2Wzd8Nm72tlHAlnAPg8YgK8fZCTRy3iyykYXL06.png',
+            'is_primary' => false,
+        ]);
+        ProductImage::create([
+            'product_id' => $product4->id,
+            'image_path' => 'products/6/sxaP0TS7QkdH7qBRF5cfL7OGc32Qtbyse3AstF7h.png',
+            'is_primary' => false,
+        ]);
 
-    /**
-     * @param  array<int, Product>  $products
-     */
-    private function seedSampleOrderMultiSeller(int $buyerId, array $products): void
-    {
-        if (Order::query()->where('buyer_id', $buyerId)->exists()) {
-            return;
-        }
-
-        Storage::disk('public')->put('seed/payment-proof.txt', "Bukti pembayaran demo\n");
-
-        DB::transaction(function () use ($buyerId, $products) {
-            $total = 0;
-            $items = [];
-
-            foreach ($products as $product) {
-                $qty = 1;
-                $subtotal = (float) $product->price * $qty;
-                $total += $subtotal;
-
-                $items[] = [
-                    'product' => $product,
-                    'qty' => $qty,
-                    'subtotal' => $subtotal,
-                ];
-            }
-
-            $order = Order::create([
-                'order_code' => 'SEED-' . Str::upper(Str::random(8)),
-                'buyer_id' => $buyerId,
-                'total_amount' => $total,
-                'shipping_address' => 'Alamat pembeli (seed)',
-                'payment_proof' => 'seed/payment-proof.txt',
-                'status' => Order::STATUS_DIBAYAR,
-            ]);
-
-            foreach ($items as $row) {
-                /** @var Product $product */
-                $product = $row['product'];
-                if ($product->stock > 0) {
-                    $product->decrement('stock', $row['qty']);
-                }
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'store_id' => $product->store_id,
-                    'qty' => $row['qty'],
-                    'price' => $product->price,
-                    'subtotal' => $row['subtotal'],
-                ]);
-            }
-        });
     }
 }
-

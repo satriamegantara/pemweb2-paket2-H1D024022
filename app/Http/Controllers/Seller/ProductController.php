@@ -8,16 +8,17 @@ use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Traits\GeneratesSlug;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
+    use GeneratesSlug;
     private function sellerStoreId(Request $request): ?int
     {
         return $request->user()->store?->id;
@@ -66,13 +67,7 @@ class ProductController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($data, $request, $storeId) {
-            $slugBase = Str::slug($data['name']);
-            $slug = $slugBase !== '' ? $slugBase : Str::random(8);
-            $i = 2;
-            while (Product::withTrashed()->where('slug', $slug)->exists()) {
-                $slug = "{$slugBase}-{$i}";
-                $i++;
-            }
+            $slug = self::generateUniqueSlug(new Product(), $data['name'], withTrashed: true);
 
             $product = Product::create([
                 'store_id' => $storeId,
@@ -131,14 +126,7 @@ class ProductController extends Controller
 
         DB::transaction(function () use ($data, $request, $product) {
             if ($product->name !== $data['name']) {
-                $slugBase = Str::slug($data['name']);
-                $slug = $slugBase !== '' ? $slugBase : Str::random(8);
-                $i = 2;
-                while (Product::withTrashed()->where('slug', $slug)->whereKeyNot($product->id)->exists()) {
-                    $slug = "{$slugBase}-{$i}";
-                    $i++;
-                }
-                $product->slug = $slug;
+                $product->slug = self::generateUniqueSlug($product, $data['name'], $product->id);
             }
 
             $product->fill([
@@ -204,6 +192,10 @@ class ProductController extends Controller
         }
 
         Gate::authorize('setPrimaryImage', $product);
+
+        if ($image->product_id !== $product->id) {
+            abort(403, 'Gambar bukan milik produk ini.');
+        }
 
         $image->setAsPrimary();
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -27,8 +28,10 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order): RedirectResponse
     {
+        Gate::authorize('updateStatus', $order);
+
         $request->validate([
-            'status' => ['required', 'string'],
+            'status' => ['required', 'string', 'in:' . implode(',', array_keys(Order::allowedTransitions()))],
         ]);
 
         $next = $request->status;

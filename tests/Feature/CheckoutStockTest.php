@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -40,13 +40,22 @@ class CheckoutStockTest extends TestCase
         ]);
     }
 
+    private function createCartForBuyer(): Cart
+    {
+        return Cart::create(['user_id' => $this->buyer->id]);
+    }
+
+    private function addToCart(Product $product, int $qty): void
+    {
+        $cart = Cart::where('user_id', $this->buyer->id)->first();
+        $cart->addItem($product->id, $qty);
+    }
+
     public function test_stock_decreases_after_successful_checkout(): void
     {
         $initialStock = $this->product->stock;
-
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 2],
-        ]);
+        $cart = $this->createCartForBuyer();
+        $this->addToCart($this->product, 2);
 
         $response = $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
 
@@ -58,8 +67,11 @@ class CheckoutStockTest extends TestCase
 
     public function test_checkout_fails_when_stock_insufficient(): void
     {
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 10],
+        $cart = $this->createCartForBuyer();
+        // Directly create cart item bypassing stock check (same as old behavior)
+        $cart->items()->create([
+            'product_id' => $this->product->id,
+            'qty' => 10,
         ]);
 
         $response = $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
@@ -74,9 +86,8 @@ class CheckoutStockTest extends TestCase
     {
         $this->product->update(['stock' => 0]);
 
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 1],
-        ]);
+        $cart = $this->createCartForBuyer();
+        $this->addToCart($this->product, 1);
 
         $response = $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
 
@@ -87,9 +98,8 @@ class CheckoutStockTest extends TestCase
     {
         $this->product->update(['is_active' => false]);
 
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 1],
-        ]);
+        $cart = $this->createCartForBuyer();
+        $this->addToCart($this->product, 1);
 
         $response = $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
 
@@ -98,9 +108,8 @@ class CheckoutStockTest extends TestCase
 
     public function test_checkout_requires_valid_quantity(): void
     {
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 0],
-        ]);
+        $cart = $this->createCartForBuyer();
+        $cart->addItem($this->product->id, 0);
 
         $response = $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
 
@@ -109,13 +118,13 @@ class CheckoutStockTest extends TestCase
 
     public function test_cart_cleared_after_successful_checkout(): void
     {
-        Session::put('cart.items', [
-            $this->product->id => ['qty' => 1],
-        ]);
+        $cart = $this->createCartForBuyer();
+        $this->addToCart($this->product, 1);
 
         $this->actingAs($this->buyer)->post(route('checkout.store'), $this->checkoutPayload());
 
-        $this->assertNull(Session::get('cart.items'));
+        $cart->refresh();
+        $this->assertEquals(0, $cart->items()->count());
     }
 
     public function test_checkout_requires_authentication(): void

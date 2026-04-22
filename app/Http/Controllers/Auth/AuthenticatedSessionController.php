@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Cart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,8 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
+        $this->mergeGuestCart($request, $user->id);
+
         $default = match ($user?->role) {
             'admin' => route('admin.dashboard', absolute: false),
             'penjual' => route('seller.dashboard', absolute: false),
@@ -37,6 +40,24 @@ class AuthenticatedSessionController extends Controller
         };
 
         return redirect()->intended($default);
+    }
+
+    private function mergeGuestCart(Request $request, int $userId): void
+    {
+        $guestId = $request->session()->get('guest_id');
+
+        if (!$guestId) {
+            return;
+        }
+
+        $userCart = Cart::firstOrCreate(
+            ['user_id' => $userId],
+            ['guest_id' => null]
+        );
+
+        $userCart->mergeFromGuest($guestId);
+
+        $request->session()->forget('guest_id');
     }
 
     /**

@@ -12,15 +12,16 @@ Route::get('/', [ProductCatalogController::class, 'home'])->name('home');
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductCatalogController::class, 'show'])->name('products.show');
 
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
-Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index')->middleware('cart');
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add')->middleware('cart');
+Route::post('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update')->middleware('cart');
+Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove')->middleware('cart');
 
-Route::middleware(['auth', 'verified', 'role:pembeli'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:pembeli', 'cart'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/my-orders', [\App\Http\Controllers\Buyer\OrderController::class, 'index'])->name('buyer.orders.index');
+    Route::get('/my-orders/{order}', [\App\Http\Controllers\Buyer\OrderController::class, 'show'])->name('buyer.orders.show');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Buyer\OrderController::class, 'cancel'])->name('buyer.orders.cancel');
 });
 

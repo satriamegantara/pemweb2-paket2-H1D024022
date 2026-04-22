@@ -12,7 +12,9 @@ class StoreController extends Controller
 {
     public function create(): View
     {
-        if (auth()->user()->store) {
+        $user = auth()->user();
+
+        if ($user->store) {
             return redirect()->route('seller.store.edit');
         }
 
@@ -22,6 +24,10 @@ class StoreController extends Controller
     public function store(SellerStoreRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->role !== 'penjual') {
+            abort(403, 'Hanya penjual yang bisa membuat toko.');
+        }
 
         if ($user->store) {
             return redirect()->route('seller.store.edit')->with('error', 'Toko sudah ada.');

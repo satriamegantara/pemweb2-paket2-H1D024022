@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,6 @@ class DashboardController extends Controller
             return redirect()->route('seller.dashboard');
         }
 
-        // buyer dashboard
         $buyerId = $request->user()->id;
 
         $ordersTotal = Order::where('buyer_id', $buyerId)->count();
@@ -32,10 +32,9 @@ class DashboardController extends Controller
         $ordersDone = Order::where('buyer_id', $buyerId)->where('status', Order::STATUS_SELESAI)->count();
         $ordersCancelled = Order::where('buyer_id', $buyerId)->where('status', Order::STATUS_DIBATALKAN)->count();
 
-        /** @var array<int, array{qty:int}> $cart */
-        $cart = $request->session()->get('cart.items', []);
-        $cartDistinct = count($cart);
-        $cartQty = array_sum(array_map(fn ($row) => (int) ($row['qty'] ?? 0), $cart));
+        $cart = Cart::where('user_id', $buyerId)->first();
+        $cartDistinct = $cart ? $cart->items()->count() : 0;
+        $cartQty = $cart ? $cart->items()->sum('qty') : 0;
 
         return view('dashboard', compact(
             'ordersTotal',

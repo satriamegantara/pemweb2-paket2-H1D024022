@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(cd /d \"D:\\\\Informatika\\\\Sem 4\\\\Pemrograman Web II\\\\laravel\")",
+      "Bash(php artisan *)"
     ]
   }
 }

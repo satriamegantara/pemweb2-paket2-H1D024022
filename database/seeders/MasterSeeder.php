@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Store;
 use App\Models\User;
+use App\Traits\GeneratesSlug;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +18,7 @@ use Illuminate\Support\Str;
 
 class MasterSeeder extends Seeder
 {
+    use GeneratesSlug;
     public function run(): void
     {
         Storage::disk('public')->makeDirectory('seed');
@@ -90,13 +92,7 @@ class MasterSeeder extends Seeder
             ['name' => 'Minuman', 'icon' => '🥤'],
             ['name' => 'Kerajinan', 'icon' => '🧶'],
         ])->map(function (array $row) {
-            $slugBase = Str::slug($row['name']);
-            $slug = $slugBase;
-            $i = 2;
-            while (Category::where('slug', $slug)->exists()) {
-                $slug = "{$slugBase}-{$i}";
-                $i++;
-            }
+            $slug = self::generateUniqueSlug(new Category(), $row['name']);
 
             return Category::firstOrCreate(['slug' => $slug], [
                 'name' => $row['name'],
@@ -121,13 +117,7 @@ class MasterSeeder extends Seeder
 
     private function seedProduct(int $storeId, int $categoryId, string $name, float $price, int $stock): Product
     {
-        $slugBase = Str::slug($name);
-        $slug = $slugBase;
-        $i = 2;
-        while (Product::withTrashed()->where('slug', $slug)->exists()) {
-            $slug = "{$slugBase}-{$i}";
-            $i++;
-        }
+        $slug = self::generateUniqueSlug(new Product(), $name, withTrashed: true);
 
         return Product::firstOrCreate(['slug' => $slug], [
             'store_id' => $storeId,

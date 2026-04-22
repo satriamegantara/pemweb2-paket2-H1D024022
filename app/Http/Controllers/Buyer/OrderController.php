@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -24,9 +25,18 @@ class OrderController extends Controller
         return view('buyer.orders.index', compact('orders', 'status'));
     }
 
+    public function show(Request $request, Order $order): View
+    {
+        Gate::authorize('view', $order);
+
+        $order->load(['items.product.images', 'items.store']);
+
+        return view('buyer.orders.show', compact('order'));
+    }
+
     public function cancel(Request $request, Order $order): RedirectResponse
     {
-        abort_if($order->buyer_id !== $request->user()->id, 403);
+        Gate::authorize('cancel', $order);
 
         if (! $order->canTransitionTo(Order::STATUS_DIBATALKAN)) {
             return back()->with('error', 'Status pesanan tidak bisa dibatalkan.');

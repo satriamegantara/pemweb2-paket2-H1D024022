@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\CheckoutStockException;
 use App\Http\Requests\CheckoutRequest;
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -28,17 +29,21 @@ class CheckoutController extends Controller
 
     public function store(CheckoutRequest $request): RedirectResponse
     {
-        /** @var array<int, array{qty:int}> $cart */
-        $cart = $request->session()->get('cart.items', []);
-        if ($cart === []) {
+        /** @var Cart $cart */
+        $cart = $request->get('cart');
+
+        if ($cart->items()->count() === 0) {
             return redirect()->route('cart.index')->with('error', 'Cart kosong.');
         }
 
         $buyerId = $request->user()->id;
-        $productIds = array_map('intval', array_keys($cart));
+
+        $cart->load('items.product');
 
         try {
-            DB::transaction(function () use ($request, $buyerId, $productIds, $cart) {
+            DB::transaction(function () use ($request, $buyerId, $cart) {
+                $productIds = $cart->items->pluck('product_id')->toArray();
+
                 $products = Product::query()
                     ->whereIn('id', $productIds)
                     ->lockForUpdate()
@@ -49,18 +54,18 @@ class CheckoutController extends Controller
                 $total = 0;
                 $checkoutIssues = [];
 
-                foreach ($cart as $productId => $row) {
-                    $product = $products->get((int) $productId);
+                foreach ($cart->items as $item) {
+                    $product = $products->get($item->product_id);
                     if (!$product || !$product->is_active) {
                         $checkoutIssues[] = [
-                            'product' => 'Produk #' . (int) $productId,
+                            'product' => $product ? $product->name : 'Produk #' . $item->product_id,
                             'message' => 'Produk sudah tidak tersedia atau nonaktif.',
                         ];
 
                         continue;
                     }
 
-                    $qty = (int) $row['qty'];
+                    $qty = $item->qty;
                     if ($qty < 1) {
                         $checkoutIssues[] = [
                             'product' => $product->name,
@@ -131,7 +136,7 @@ class CheckoutController extends Controller
 
                 $this->notifySellers($order);
 
-                $request->session()->forget('cart.items');
+                $cart->clear();
             }, 3);
         } catch (CheckoutStockException $e) {
             return redirect()
@@ -164,4 +169,3 @@ class CheckoutController extends Controller
         }
     }
 }
-

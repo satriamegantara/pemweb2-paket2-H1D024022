@@ -11,6 +11,7 @@ use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -109,9 +110,7 @@ class ProductController extends Controller
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
-        if ($product->store_id !== $storeId) {
-            abort(403);
-        }
+        Gate::authorize('update', $product);
 
         $product->load('images');
         $categories = Category::orderBy('name')->get();
@@ -126,9 +125,7 @@ class ProductController extends Controller
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
-        if ($product->store_id !== $storeId) {
-            abort(403);
-        }
+        Gate::authorize('update', $product);
 
         $data = $request->validated();
 
@@ -186,9 +183,7 @@ class ProductController extends Controller
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
-        if ($product->store_id !== $storeId) {
-            abort(403);
-        }
+        Gate::authorize('delete', $product);
 
         DB::transaction(function () use ($product) {
             $product->load('images');
@@ -208,9 +203,7 @@ class ProductController extends Controller
             abort(403);
         }
 
-        if ($product->store_id !== $storeId || $image->product_id !== $product->id) {
-            abort(403);
-        }
+        Gate::authorize('setPrimaryImage', $product);
 
         $image->setAsPrimary();
 

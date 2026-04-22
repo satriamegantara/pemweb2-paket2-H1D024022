@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained('stores');
             $table->foreignId('category_id')->constrained('categories');
-            $table->foreignId('primary_image_id')->nullable()->constrained('product_images')->onDelete('set null');
+            $table->unsignedBigInteger('primary_image_id')->nullable();
             $table->string('name', 150);
             $table->string('slug', 180)->unique();
             $table->text('description')->nullable();
@@ -24,6 +23,10 @@ return new class extends Migration
             $table->unsignedInteger('weight')->nullable()->comment('gram');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['store_id', 'category_id']);
+            $table->index('slug');
         });
     }
 

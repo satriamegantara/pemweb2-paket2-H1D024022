@@ -16,7 +16,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('products.index') }}" class="flex items-center gap-2">
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
                         <x-application-logo class="block h-8 w-auto fill-current text-primary" />
                         <span class="font-semibold text-gray-900">UMKMart</span>
                     </a>

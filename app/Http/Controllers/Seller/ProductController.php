@@ -26,7 +26,7 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -35,9 +35,9 @@ class ProductController extends Controller
 
         $products = Product::query()
             ->where('store_id', $storeId)
-            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
-            ->when($active === '1', fn ($q) => $q->where('is_active', true))
-            ->when($active === '0', fn ($q) => $q->where('is_active', false))
+            ->when($search !== '', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when($active === '1', fn($q) => $q->where('is_active', true))
+            ->when($active === '0', fn($q) => $q->where('is_active', false))
             ->latest('id')
             ->paginate(10)
             ->withQueryString();
@@ -47,7 +47,7 @@ class ProductController extends Controller
 
     public function create(Request $request): View
     {
-        if (! $this->sellerStoreId($request)) {
+        if (!$this->sellerStoreId($request)) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -59,7 +59,7 @@ class ProductController extends Controller
     public function store(ProductStoreRequest $request): RedirectResponse
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -69,7 +69,7 @@ class ProductController extends Controller
             $slugBase = Str::slug($data['name']);
             $slug = $slugBase !== '' ? $slugBase : Str::random(8);
             $i = 2;
-            while (Product::where('slug', $slug)->exists()) {
+            while (Product::withTrashed()->where('slug', $slug)->exists()) {
                 $slug = "{$slugBase}-{$i}";
                 $i++;
             }
@@ -106,7 +106,7 @@ class ProductController extends Controller
     public function edit(Request $request, Product $product): View
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -121,7 +121,7 @@ class ProductController extends Controller
     public function update(ProductUpdateRequest $request, Product $product): RedirectResponse
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -134,7 +134,7 @@ class ProductController extends Controller
                 $slugBase = Str::slug($data['name']);
                 $slug = $slugBase !== '' ? $slugBase : Str::random(8);
                 $i = 2;
-                while (Product::where('slug', $slug)->whereKeyNot($product->id)->exists()) {
+                while (Product::withTrashed()->where('slug', $slug)->whereKeyNot($product->id)->exists()) {
                     $slug = "{$slugBase}-{$i}";
                     $i++;
                 }
@@ -179,7 +179,7 @@ class ProductController extends Controller
     public function destroy(Request $request, Product $product): RedirectResponse
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             return redirect()->route('seller.store.create')->with('error', 'Silakan buat toko dulu.');
         }
 
@@ -199,7 +199,7 @@ class ProductController extends Controller
     public function setPrimaryImage(Request $request, Product $product, ProductImage $image): RedirectResponse
     {
         $storeId = $this->sellerStoreId($request);
-        if (! $storeId) {
+        if (!$storeId) {
             abort(403);
         }
 

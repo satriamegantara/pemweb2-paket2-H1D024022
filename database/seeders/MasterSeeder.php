@@ -124,7 +124,7 @@ class MasterSeeder extends Seeder
         $slugBase = Str::slug($name);
         $slug = $slugBase;
         $i = 2;
-        while (Product::where('slug', $slug)->exists()) {
+        while (Product::withTrashed()->where('slug', $slug)->exists()) {
             $slug = "{$slugBase}-{$i}";
             $i++;
         }
@@ -216,7 +216,7 @@ SVG;
             }
 
             $order = Order::create([
-                'order_code' => 'SEED-'.Str::upper(Str::random(8)),
+                'order_code' => 'SEED-' . Str::upper(Str::random(8)),
                 'buyer_id' => $buyerId,
                 'total_amount' => $total,
                 'shipping_address' => 'Alamat pembeli (seed)',

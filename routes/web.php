@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\ProductCatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,19 +27,17 @@ Route::middleware(['auth', 'verified', 'role:pembeli'])->group(function () {
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Buyer\OrderController::class, 'cancel'])->name('buyer.orders.cancel');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('/', \App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
     Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::post('orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.status');
 });
 
 Route::middleware(['auth', 'verified', 'role:penjual'])->prefix('seller')->name('seller.')->group(function () {
-    Route::view('/', 'seller.dashboard')->name('dashboard');
+    Route::get('/', \App\Http\Controllers\Seller\DashboardController::class)->name('dashboard');
     Route::get('store/create', [\App\Http\Controllers\Seller\StoreController::class, 'create'])->name('store.create');
     Route::post('store', [\App\Http\Controllers\Seller\StoreController::class, 'store'])->name('store.store');
     Route::get('store', [\App\Http\Controllers\Seller\StoreController::class, 'edit'])->name('store.edit');

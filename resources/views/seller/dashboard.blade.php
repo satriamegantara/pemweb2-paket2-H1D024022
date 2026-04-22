@@ -1,15 +1,82 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Seller Dashboard') }}
-        </h2>
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Seller Dashboard') }}
+            </h2>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('seller.products.index') }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+                    {{ __('Produk') }}
+                </a>
+                <a href="{{ route('seller.orders.index') }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                    {{ __('Pesanan') }}
+                </a>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __('Halo penjual.') }}
+            @if (! $hasStore)
+                <div class="rounded-lg bg-amber-50 p-6 shadow-sm">
+                    <div class="text-sm font-semibold text-amber-800">{{ __('Kamu belum punya toko.') }}</div>
+                    <div class="mt-1 text-sm text-amber-700">{{ __('Buat toko dulu supaya bisa kelola produk & pesanan.') }}</div>
+                    <a href="{{ route('seller.store.create') }}" class="mt-4 inline-flex items-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-500">
+                        {{ __('Buat Toko') }}
+                    </a>
+                </div>
+            @endif
+
+            <div class="mt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-lg bg-white p-6 shadow-sm">
+                    <div class="text-xs text-gray-500">{{ __('Total Produk') }}</div>
+                    <div class="mt-1 text-2xl font-bold text-gray-900">{{ $productsTotal }}</div>
+                    <div class="mt-2 text-sm text-gray-600">Aktif: {{ $productsActive }} • Nonaktif: {{ $productsInactive }}</div>
+                </div>
+                <div class="rounded-lg bg-white p-6 shadow-sm">
+                    <div class="text-xs text-gray-500">{{ __('Total Item Pesanan') }}</div>
+                    <div class="mt-1 text-2xl font-bold text-gray-900">{{ $itemsTotal }}</div>
+                    <div class="mt-2 text-sm text-gray-600">{{ __('Hanya item milik toko kamu') }}</div>
+                </div>
+                <div class="rounded-lg bg-white p-6 shadow-sm">
+                    <div class="text-xs text-gray-500">{{ __('Menunggu Pembayaran') }}</div>
+                    <div class="mt-1 text-2xl font-bold text-gray-900">{{ $itemsWaiting }}</div>
+                    <div class="mt-2 text-sm text-gray-600">{{ __('Butuh verifikasi admin') }}</div>
+                </div>
+                <div class="rounded-lg bg-white p-6 shadow-sm">
+                    <div class="text-xs text-gray-500">{{ __('Dibayar') }}</div>
+                    <div class="mt-1 text-2xl font-bold text-gray-900">{{ $itemsPaid }}</div>
+                    <div class="mt-2 text-sm text-gray-600">{{ __('Siap diproses') }}</div>
+                </div>
+            </div>
+
+            <div class="mt-6 rounded-lg bg-white p-6 shadow-sm">
+                <h3 class="text-sm font-semibold text-gray-700">{{ __('Ringkasan Status (item pesanan)') }}</h3>
+                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                    <div class="rounded-md bg-amber-50 p-4">
+                        <div class="text-xs text-amber-700">{{ __('menunggu_pembayaran') }}</div>
+                        <div class="mt-1 text-xl font-bold text-amber-900">{{ $itemsWaiting }}</div>
+                    </div>
+                    <div class="rounded-md bg-blue-50 p-4">
+                        <div class="text-xs text-blue-700">{{ __('dibayar') }}</div>
+                        <div class="mt-1 text-xl font-bold text-blue-900">{{ $itemsPaid }}</div>
+                    </div>
+                    <div class="rounded-md bg-indigo-50 p-4">
+                        <div class="text-xs text-indigo-700">{{ __('diproses') }}</div>
+                        <div class="mt-1 text-xl font-bold text-indigo-900">{{ $itemsProcessed }}</div>
+                    </div>
+                    <div class="rounded-md bg-purple-50 p-4">
+                        <div class="text-xs text-purple-700">{{ __('dikirim') }}</div>
+                        <div class="mt-1 text-xl font-bold text-purple-900">{{ $itemsShipped }}</div>
+                    </div>
+                    <div class="rounded-md bg-green-50 p-4">
+                        <div class="text-xs text-green-700">{{ __('selesai') }}</div>
+                        <div class="mt-1 text-xl font-bold text-green-900">{{ $itemsDone }}</div>
+                    </div>
+                    <div class="rounded-md bg-gray-50 p-4">
+                        <div class="text-xs text-gray-700">{{ __('dibatalkan') }}</div>
+                        <div class="mt-1 text-xl font-bold text-gray-900">{{ $itemsCancelled }}</div>
+                    </div>
                 </div>
             </div>
         </div>

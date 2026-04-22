@@ -27,6 +27,8 @@ class DashboardController extends Controller
         $itemsShipped = 0;
         $itemsDone = 0;
         $itemsCancelled = 0;
+        $recentNotifications = collect();
+        $unreadNotificationsCount = 0;
 
         if ($storeId) {
             $productsTotal = Product::where('store_id', $storeId)->count();
@@ -34,12 +36,15 @@ class DashboardController extends Controller
             $productsInactive = Product::where('store_id', $storeId)->where('is_active', false)->count();
 
             $itemsTotal = OrderItem::where('store_id', $storeId)->count();
-            $itemsWaiting = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_MENUNGGU_PEMBAYARAN))->count();
-            $itemsPaid = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_DIBAYAR))->count();
-            $itemsProcessed = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_DIPROSES))->count();
-            $itemsShipped = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_DIKIRIM))->count();
-            $itemsDone = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_SELESAI))->count();
-            $itemsCancelled = OrderItem::where('store_id', $storeId)->whereHas('order', fn ($q) => $q->where('status', Order::STATUS_DIBATALKAN))->count();
+            $itemsWaiting = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_MENUNGGU_PEMBAYARAN))->count();
+            $itemsPaid = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_DIBAYAR))->count();
+            $itemsProcessed = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_DIPROSES))->count();
+            $itemsShipped = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_DIKIRIM))->count();
+            $itemsDone = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_SELESAI))->count();
+            $itemsCancelled = OrderItem::where('store_id', $storeId)->whereHas('order', fn($q) => $q->where('status', Order::STATUS_DIBATALKAN))->count();
+
+            $recentNotifications = $request->user()->notifications()->latest()->limit(8)->get();
+            $unreadNotificationsCount = $request->user()->unreadNotifications()->count();
         }
 
         return view('seller.dashboard', compact(
@@ -54,6 +59,8 @@ class DashboardController extends Controller
             'itemsShipped',
             'itemsDone',
             'itemsCancelled',
+            'recentNotifications',
+            'unreadNotificationsCount',
         ));
     }
 }

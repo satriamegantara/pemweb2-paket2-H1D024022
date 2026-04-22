@@ -5,10 +5,12 @@
                 {{ __('Seller Dashboard') }}
             </h2>
             <div class="flex items-center gap-2">
-                <a href="{{ route('seller.products.index') }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+                <a href="{{ route('seller.products.index') }}"
+                    class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
                     {{ __('Produk') }}
                 </a>
-                <a href="{{ route('seller.orders.index') }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                <a href="{{ route('seller.orders.index') }}"
+                    class="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
                     {{ __('Pesanan') }}
                 </a>
             </div>
@@ -17,11 +19,13 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if (! $hasStore)
+            @if (!$hasStore)
                 <div class="rounded-lg bg-amber-50 p-6 shadow-sm">
                     <div class="text-sm font-semibold text-amber-800">{{ __('Kamu belum punya toko.') }}</div>
-                    <div class="mt-1 text-sm text-amber-700">{{ __('Buat toko dulu supaya bisa kelola produk & pesanan.') }}</div>
-                    <a href="{{ route('seller.store.create') }}" class="mt-4 inline-flex items-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-500">
+                    <div class="mt-1 text-sm text-amber-700">{{ __('Buat toko dulu supaya bisa kelola produk & pesanan.') }}
+                    </div>
+                    <a href="{{ route('seller.store.create') }}"
+                        class="mt-4 inline-flex items-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-500">
                         {{ __('Buat Toko') }}
                     </a>
                 </div>
@@ -31,7 +35,8 @@
                 <div class="rounded-lg bg-white p-6 shadow-sm">
                     <div class="text-xs text-gray-500">{{ __('Total Produk') }}</div>
                     <div class="mt-1 text-2xl font-bold text-gray-900">{{ $productsTotal }}</div>
-                    <div class="mt-2 text-sm text-gray-600">Aktif: {{ $productsActive }} • Nonaktif: {{ $productsInactive }}</div>
+                    <div class="mt-2 text-sm text-gray-600">Aktif: {{ $productsActive }} • Nonaktif:
+                        {{ $productsInactive }}</div>
                 </div>
                 <div class="rounded-lg bg-white p-6 shadow-sm">
                     <div class="text-xs text-gray-500">{{ __('Total Item Pesanan') }}</div>
@@ -79,7 +84,44 @@
                     </div>
                 </div>
             </div>
+
+            <div class="mt-6 rounded-lg bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-sm font-semibold text-gray-700">{{ __('Notifikasi Pesanan') }}</h3>
+                    @if ($unreadNotificationsCount > 0)
+                        <span
+                            class="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700">
+                            {{ $unreadNotificationsCount }} {{ __('belum dibaca') }}
+                        </span>
+                    @endif
+                </div>
+
+                @if ($recentNotifications->isEmpty())
+                    <p class="mt-4 text-sm text-gray-500">{{ __('Belum ada notifikasi untuk saat ini.') }}</p>
+                @else
+                <div class="mt-4 divide-y divide-gray-100 rounded-md border border-gray-100">
+                    @foreach ($recentNotifications as $notification)
+                    @php($message = $notification->data['message'] ?? 'Ada pembaruan pesanan baru')
+                    @php($orderCode = $notification->data['order_code'] ?? null)
+
+                    <div class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <p
+                                class="text-sm font-medium {{ is_null($notification->read_at) ? 'text-gray-900' : 'text-gray-700' }}">
+                                {{ $message }}
+                            </p>
+                            @if ($orderCode)
+                                <p class="mt-0.5 text-xs text-gray-500">{{ __('Kode Pesanan') }}: {{ $orderCode }}</p>
+                            @endif
+                        </div>
+                        <div class="text-xs text-gray-500 sm:whitespace-nowrap">
+                            {{ $notification->created_at?->diffForHumans() }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
         </div>
     </div>
 </x-app-layout>
-

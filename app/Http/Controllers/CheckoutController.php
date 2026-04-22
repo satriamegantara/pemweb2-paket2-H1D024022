@@ -7,6 +7,7 @@ use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Notifications\NewOrderNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -49,9 +50,9 @@ class CheckoutController extends Controller
 
                 foreach ($cart as $productId => $row) {
                     $product = $products->get((int) $productId);
-                    if (! $product || ! $product->is_active) {
+                    if (!$product || !$product->is_active) {
                         $checkoutIssues[] = [
-                            'product' => 'Produk #'.(int) $productId,
+                            'product' => 'Produk #' . (int) $productId,
                             'message' => 'Produk sudah tidak tersedia atau nonaktif.',
                         ];
 
@@ -71,7 +72,7 @@ class CheckoutController extends Controller
                     if ($product->stock < $qty) {
                         $checkoutIssues[] = [
                             'product' => $product->name,
-                            'message' => 'Stok tersedia hanya '.$product->stock.'.',
+                            'message' => 'Stok tersedia hanya ' . $product->stock . '.',
                             'requested' => $qty,
                             'available' => $product->stock,
                         ];
@@ -127,6 +128,8 @@ class CheckoutController extends Controller
                     ]);
                 }
 
+                $this->notifySellers($order);
+
                 $request->session()->forget('cart.items');
             }, 3);
         } catch (CheckoutStockException $e) {
@@ -146,7 +149,18 @@ class CheckoutController extends Controller
 
     private function generateOrderCode(): string
     {
-        return 'UMK-'.now()->format('Ymd').'-'.Str::upper(Str::random(8));
+        return 'UMK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(8));
+    }
+
+    private function notifySellers(Order $order): void
+    {
+        $sellerUsers = User::whereHas('store', fn($q) => $q->whereIn('id', $order->items->pluck('store_id')))
+            ->with('store')
+            ->get();
+
+        foreach ($sellerUsers as $seller) {
+            $seller->notify(new NewOrderNotification($order));
+        }
     }
 }
 

@@ -24,4 +24,18 @@ class ProductImage extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function setAsPrimary(): void
+    {
+        if (!$this->product->primary_image_id) {
+            $this->product->update(['primary_image_id' => $this->id]);
+        }
+        $this->product->images()->whereKeyNot($this->id)->update(['is_primary' => false]);
+        $this->update(['is_primary' => true]);
+    }
+
+    public static function findFirstImageOrCreate(Product $product): ?ProductImage
+    {
+        return $product->images()->first();
+    }
 }

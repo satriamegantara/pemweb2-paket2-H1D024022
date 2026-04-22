@@ -33,7 +33,7 @@
                     </x-nav-link>
 
                     @auth
-                        <x-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard') || request()->routeIs('admin.*') || request()->routeIs('seller.*')">
+                        <x-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('seller.dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
 
@@ -137,7 +137,7 @@
             </x-responsive-nav-link>
 
             @auth
-                <x-responsive-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard') || request()->routeIs('admin.*') || request()->routeIs('seller.*')">
+                <x-responsive-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('seller.dashboard')">
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
 

@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified', 'role:penjual'])->prefix('seller')->name(
     Route::put('store', [\App\Http\Controllers\Seller\StoreController::class, 'update'])->name('store.update');
 
     Route::resource('products', \App\Http\Controllers\Seller\ProductController::class)->except(['show']);
+    Route::post('products/{product}/images/{image}/primary', [\App\Http\Controllers\Seller\ProductController::class, 'setPrimaryImage'])->name('products.setPrimaryImage');
     Route::get('orders', [\App\Http\Controllers\Seller\OrderController::class, 'index'])->name('orders.index');
     Route::post('orders/{order}/status', [\App\Http\Controllers\Seller\OrderController::class, 'updateStatus'])->name('orders.status');
 

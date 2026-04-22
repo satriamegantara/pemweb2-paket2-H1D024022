@@ -200,5 +200,21 @@ class ProductController extends Controller
 
         return redirect()->route('seller.products.index')->with('success', 'Produk berhasil dihapus.');
     }
+
+    public function setPrimaryImage(Request $request, Product $product, ProductImage $image): RedirectResponse
+    {
+        $storeId = $this->sellerStoreId($request);
+        if (! $storeId) {
+            abort(403);
+        }
+
+        if ($product->store_id !== $storeId || $image->product_id !== $product->id) {
+            abort(403);
+        }
+
+        $image->setAsPrimary();
+
+        return back()->with('success', 'Gambar utama berhasil diubah.');
+    }
 }
 

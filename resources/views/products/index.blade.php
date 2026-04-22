@@ -63,37 +63,37 @@
                 </form>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
                     @php($img = $product->images->firstWhere('is_primary', true) ?? $product->images->first())
-                    <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                    <div class="overflow-hidden rounded-lg bg-white shadow-sm">
                         <a href="{{ route('products.show', $product) }}" class="block">
                             @if ($img)
-                                <img src="{{ asset('storage/'.$img->image_path) }}" class="h-48 w-full object-cover" alt="Product image">
+                                <img src="{{ asset('storage/'.$img->image_path) }}" class="h-36 w-full object-cover lg:h-32 xl:h-36" alt="Product image">
                             @else
-                                <div class="h-48 w-full bg-gray-100 flex items-center justify-center text-sm text-gray-500">No image</div>
+                                <div class="flex h-36 w-full items-center justify-center bg-gray-100 text-sm text-gray-500 lg:h-32 xl:h-36">No image</div>
                             @endif
                         </a>
-                        <div class="p-5">
-                            <a href="{{ route('products.show', $product) }}" class="font-semibold text-gray-900 hover:text-indigo-600">
+                        <div class="p-4">
+                            <a href="{{ route('products.show', $product) }}" class="text-sm font-semibold text-gray-900 hover:text-indigo-600 lg:text-base">
                                 {{ $product->name }}
                             </a>
-                            <div class="mt-1 text-sm text-gray-600">
+                            <div class="mt-1 text-xs text-gray-600 lg:text-sm">
                                 {{ $product->category?->name }}
                             </div>
-                            <div class="mt-3 flex items-center justify-between gap-3">
-                                <div class="font-semibold text-gray-900">
+                            <div class="mt-3 flex items-center justify-between gap-2">
+                                <div class="text-sm font-semibold text-gray-900 lg:text-base">
                                     Rp {{ number_format((float) $product->price, 0, ',', '.') }}
                                 </div>
                                 <form method="POST" action="{{ route('cart.add', $product) }}">
                                     @csrf
                                     <input type="hidden" name="qty" value="1">
-                                    <button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500">
+                                    <button class="inline-flex items-center rounded-md bg-indigo-600 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-indigo-500 lg:px-3 lg:py-2 lg:text-xs">
                                         {{ __('+ Cart') }}
                                     </button>
                                 </form>
                             </div>
-                            <div class="mt-2 text-xs text-gray-500">
+                            <div class="mt-2 text-[11px] text-gray-500 lg:text-xs">
                                 Stok: {{ $product->stock }}
                             </div>
                         </div>

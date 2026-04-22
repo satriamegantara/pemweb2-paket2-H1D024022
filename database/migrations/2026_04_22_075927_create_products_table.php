@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained('stores');
             $table->foreignId('category_id')->constrained('categories');
+            $table->foreignId('primary_image_id')->nullable()->constrained('product_images')->onDelete('set null');
             $table->string('name', 150);
             $table->string('slug', 180)->unique();
             $table->text('description')->nullable();

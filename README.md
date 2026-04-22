@@ -36,12 +36,12 @@ php artisan key:generate
 
 # Buat database MySQL
 # mysql -u root -p
-# CREATE DATABASE marketplace;
+# CREATE DATABASE umkmart;
 
 # Update .env dengan credentials database
-# DB_DATABASE=marketplace
+# DB_DATABASE=umkmart
 # DB_USERNAME=root
-# DB_PASSWORD=your_password
+# DB_PASSWORD=
 
 # Run migrations & seeders
 php artisan migrate:fresh --seed
@@ -57,33 +57,37 @@ Buka `http://localhost:8000` di browser.
 
 ## Default User Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@example.com | password |
-| Penjual | seller@example.com | password |
+| Role    | Email               | Password |
+| ------- | ------------------- | -------- |
+| Admin   | admin@example.com   | password |
+| Penjual | seller@example.com  | password |
 | Penjual | seller1@example.com | password |
 | Penjual | seller2@example.com | password |
-| Pembeli | buyer@example.com | password |
+| Pembeli | buyer@example.com   | password |
 
 ## Fitur Utama
 
 ### Autentikasi Multi-Role
+
 - **Admin** - Kelola kategori, lihat semua pesanan
 - **Penjual** - Kelola toko, produk, pesanan masuk, laporan penjualan
 - **Pembeli** - Browse katalog, shopping cart, checkout, lacak pesanan
 
 ### Katalog Produk
+
 - Halaman katalog dengan search, filter kategori, sort harga
 - Filter stok tersedia
 - Pagination otomatis
 
 ### Shopping Cart
+
 - Berbasis session (guest cart + user cart)
 - Cart guest otomatis merge saat login
 - Update quantity, hapus item
 - Checkout hanya untuk role pembeli
 
 ### Checkout & Pesanan
+
 - Input alamat pengiriman
 - Upload bukti transfer
 - Validasi stok dengan race condition handling (lockForUpdate)
@@ -91,16 +95,19 @@ Buka `http://localhost:8000` di browser.
 - Workflow: Menunggu Pembayaran → Dibayar → Diproses → Dikirim → Selesai
 
 ### Multi-Seller Order Split
+
 - Satu order bisa berisi produk dari penjual berbeda
 - Notifikasi terpisah ke masing-masing penjual
 - Penjual hanya melihat order_items miliknya
 
 ### Laporan Penjualan
+
 - Filter berdasarkan tanggal
 - Export PDF (DomPDF)
 - Export Excel (Maatwebsite)
 
 ### Upload Multi-Gambar
+
 - Min 3, maks 5 gambar per produk
 - Tandai gambar utama
 - Galeri foto di halaman detail produk
@@ -130,6 +137,7 @@ Buka `http://localhost:8000` di browser.
 ## Database Schema
 
 ### Tables
+
 - `users` - User dengan role (admin/penjual/pembeli)
 - `stores` - Data toko penjual
 - `categories` - Kategori produk
@@ -142,6 +150,7 @@ Buka `http://localhost:8000` di browser.
 - `notifications` - Notifikasi sistem
 
 ### Relasi Utama
+
 ```
 User 1:1 Store
 Store 1:N Product
@@ -165,7 +174,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=marketplace
+DB_DATABASE=umkmart
 DB_USERNAME=root
 DB_PASSWORD=
 

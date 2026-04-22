@@ -19,10 +19,11 @@
 
 <body class="font-sans antialiased dark:bg-gray-900 dark:text-gray-100">
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50 dark:bg-gray-900">
-        <div>
+        <div class="flex items-center gap-4">
             <a href="/">
                 <x-application-logo class="w-20 h-20 fill-current text-primary" />
             </a>
+            <x-dark-mode-toggle />
         </div>
 
         <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white border border-gray-200 shadow-md overflow-hidden sm:rounded-lg dark:bg-gray-800 dark:border-gray-700">

@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\CheckoutRequest;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+use Throwable;
+
+class CheckoutController extends Controller
+{
+    public function create(): View
+    {
+        $user = auth()->user();
+
+        return view('checkout.create', [
+            'defaultAddress' => old('shipping_address', $user->address ?? ''),
+        ]);
+    }
+
+    public function store(CheckoutRequest $request): RedirectResponse
+    {
+        /** @var array<int, array{qty:int}> $cart */
+        $cart = $request->session()->get('cart.items', []);
+        if ($cart === []) {
+            return redirect()->route('cart.index')->with('error', 'Cart kosong.');
+        }
+
+        $buyerId = $request->user()->id;
+        $productIds = array_map('intval', array_keys($cart));
+
+        try {
+            DB::transaction(function () use ($request, $buyerId, $productIds, $cart) {
+                $products = Product::query()
+                    ->whereIn('id', $productIds)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                $itemsPayload = [];
+                $total = 0;
+
+                foreach ($cart as $productId => $row) {
+                    $product = $products->get((int) $productId);
+                    if (! $product || ! $product->is_active) {
+                        throw new \RuntimeException('Ada produk di cart yang sudah tidak tersedia.');
+                    }
+
+                    $qty = (int) $row['qty'];
+                    if ($qty < 1) {
+                        throw new \RuntimeException('Qty tidak valid.');
+                    }
+
+                    if ($product->stock < $qty) {
+                        throw new \RuntimeException("Stok tidak cukup untuk produk: {$product->name}. Sisa stok: {$product->stock}.");
+                    }
+
+                    $subtotal = (float) $product->price * $qty;
+                    $total += $subtotal;
+
+                    $itemsPayload[] = [
+                        'product' => $product,
+                        'qty' => $qty,
+                        'price' => $product->price,
+                        'subtotal' => $subtotal,
+                        'store_id' => $product->store_id,
+                    ];
+                }
+
+                $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+
+                $orderCode = $this->generateOrderCode();
+                while (Order::where('order_code', $orderCode)->exists()) {
+                    $orderCode = $this->generateOrderCode();
+                }
+
+                $order = Order::create([
+                    'order_code' => $orderCode,
+                    'buyer_id' => $buyerId,
+                    'total_amount' => $total,
+                    'shipping_address' => $request->shipping_address,
+                    'payment_proof' => $proofPath,
+                    'status' => 'menunggu_pembayaran',
+                ]);
+
+                foreach ($itemsPayload as $row) {
+                    /** @var Product $product */
+                    $product = $row['product'];
+
+                    $product->decrement('stock', $row['qty']);
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'store_id' => $row['store_id'],
+                        'qty' => $row['qty'],
+                        'price' => $row['price'],
+                        'subtotal' => $row['subtotal'],
+                    ]);
+                }
+
+                $request->session()->forget('cart.items');
+            }, 3);
+        } catch (Throwable $e) {
+            return redirect()
+                ->route('checkout.create')
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Checkout berhasil. Pesanan dibuat.');
+    }
+
+    private function generateOrderCode(): string
+    {
+        return 'UMK-'.now()->format('Ymd').'-'.Str::upper(Str::random(8));
+    }
+}
+

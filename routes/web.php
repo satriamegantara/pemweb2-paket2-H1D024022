@@ -8,10 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::get('/', [ProductCatalogController::class, 'home'])->name('home');
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductCatalogController::class, 'show'])->name('products.show');
 

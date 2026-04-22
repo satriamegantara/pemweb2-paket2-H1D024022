@@ -18,7 +18,7 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-white">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
@@ -34,8 +34,8 @@
         <main>
             @if (session('success'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    <div class="rounded-md bg-green-50 p-4">
-                        <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                    <div class="rounded-md bg-primary-50 p-4">
+                        <p class="text-sm font-medium text-primary">{{ session('success') }}</p>
                     </div>
                 </div>
             @endif

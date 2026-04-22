@@ -42,9 +42,9 @@ class ProductCatalogController extends Controller
             $query->where('stock', '>', 0);
         }
 
-        $query->when($sort === 'price_asc', fn ($q) => $q->orderBy('price'))
-            ->when($sort === 'price_desc', fn ($q) => $q->orderByDesc('price'))
-            ->when($sort === 'latest', fn ($q) => $q->latest('id'));
+        $query->when($sort === 'price_asc', fn($q) => $q->orderBy('price'))
+            ->when($sort === 'price_desc', fn($q) => $q->orderByDesc('price'))
+            ->when($sort === 'latest', fn($q) => $q->latest('id'));
 
         $products = $query->paginate(10)->withQueryString();
 
@@ -66,9 +66,22 @@ class ProductCatalogController extends Controller
     {
         $product->load(['images', 'store', 'category']);
 
-        abort_if(! $product->is_active, 404);
+        abort_if(!$product->is_active, 404);
 
         return view('products.show', compact('product'));
+    }
+
+    public function home(): View
+    {
+        $products = Product::query()
+            ->with(['images', 'category', 'store'])
+            ->where('is_active', true)
+            ->latest('id')
+            ->paginate(10);
+
+        $categories = Category::orderBy('name')->get();
+
+        return view('welcome', compact('products', 'categories'));
     }
 }
 

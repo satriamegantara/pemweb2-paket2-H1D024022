@@ -17,7 +17,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('products.index') }}" class="flex items-center gap-2">
-                        <x-application-logo class="block h-8 w-auto fill-current text-indigo-600" />
+                        <x-application-logo class="block h-8 w-auto fill-current text-primary" />
                         <span class="font-semibold text-gray-900">UMKMart</span>
                     </a>
                 </div>
@@ -114,7 +114,7 @@
                             {{ __('Login') }}
                         </a>
                         <a href="{{ route('register') }}"
-                            class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                            class="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-600">
                             {{ __('Register') }}
                         </a>
                     </div>

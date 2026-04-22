@@ -8,7 +8,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <form method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                <form method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-6">
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700">{{ __('Search') }}</label>
                         <input name="q" value="{{ $search }}" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Cari produk..." />
@@ -25,6 +25,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('Min Harga') }}</label>
+                        <input name="min_price" inputmode="numeric" value="{{ $minPrice }}" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="0" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('Max Harga') }}</label>
+                        <input name="max_price" inputmode="numeric" value="{{ $maxPrice }}" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="100000" />
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700">{{ __('Sort') }}</label>
                         <select name="sort" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="latest" @selected($sort === 'latest')>{{ __('Terbaru') }}</option>
@@ -33,7 +43,13 @@
                         </select>
                     </div>
 
-                    <div class="md:col-span-4 flex items-center gap-3">
+                    <div class="md:col-span-6 flex flex-wrap items-center gap-3">
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="in_stock" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                @checked((bool) $inStock)>
+                            <span>{{ __('Hanya stok tersedia') }}</span>
+                        </label>
+
                         <button class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
                             {{ __('Terapkan') }}
                         </button>

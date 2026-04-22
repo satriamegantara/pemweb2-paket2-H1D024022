@@ -14,6 +14,9 @@ class ProductCatalogController extends Controller
         $search = trim((string) $request->query('q', ''));
         $categoryId = $request->query('category');
         $sort = $request->query('sort', 'latest'); // latest|price_asc|price_desc
+        $minPrice = $request->query('min_price');
+        $maxPrice = $request->query('max_price');
+        $inStock = $request->boolean('in_stock');
 
         $query = Product::query()
             ->with(['images', 'category'])
@@ -27,6 +30,18 @@ class ProductCatalogController extends Controller
             $query->where('category_id', $categoryId);
         }
 
+        if (is_numeric($minPrice)) {
+            $query->where('price', '>=', (float) $minPrice);
+        }
+
+        if (is_numeric($maxPrice)) {
+            $query->where('price', '<=', (float) $maxPrice);
+        }
+
+        if ($inStock) {
+            $query->where('stock', '>', 0);
+        }
+
         $query->when($sort === 'price_asc', fn ($q) => $q->orderBy('price'))
             ->when($sort === 'price_desc', fn ($q) => $q->orderByDesc('price'))
             ->when($sort === 'latest', fn ($q) => $q->latest('id'));
@@ -35,7 +50,16 @@ class ProductCatalogController extends Controller
 
         $categories = Category::orderBy('name')->get();
 
-        return view('products.index', compact('products', 'categories', 'search', 'categoryId', 'sort'));
+        return view('products.index', compact(
+            'products',
+            'categories',
+            'search',
+            'categoryId',
+            'sort',
+            'minPrice',
+            'maxPrice',
+            'inStock',
+        ));
     }
 
     public function show(Product $product): View

@@ -8,6 +8,32 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                @if (session('checkoutIssues'))
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <p class="text-sm font-semibold text-red-800">
+                            {{ __('Checkout gagal karena beberapa item berikut bermasalah:') }}
+                        </p>
+
+                        <ul class="mt-3 space-y-3">
+                            @foreach (session('checkoutIssues') as $issue)
+                                <li class="rounded-md bg-white/70 p-3 text-sm text-red-700 ring-1 ring-red-100">
+                                    <div class="font-medium text-red-900">
+                                        {{ $issue['product'] }}
+                                    </div>
+                                    <div class="mt-1">
+                                        {{ $issue['message'] }}
+                                    </div>
+                                    @if (isset($issue['requested'], $issue['available']))
+                                        <div class="mt-1 text-xs text-red-600">
+                                            {{ __('Pesanan: :requested, stok tersedia: :available', ['requested' => $issue['requested'], 'available' => $issue['available']]) }}
+                                        </div>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('checkout.store') }}" enctype="multipart/form-data">
                     @csrf
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CheckoutStockException;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -44,20 +45,38 @@ class CheckoutController extends Controller
 
                 $itemsPayload = [];
                 $total = 0;
+                $checkoutIssues = [];
 
                 foreach ($cart as $productId => $row) {
                     $product = $products->get((int) $productId);
                     if (! $product || ! $product->is_active) {
-                        throw new \RuntimeException('Ada produk di cart yang sudah tidak tersedia.');
+                        $checkoutIssues[] = [
+                            'product' => 'Produk #'.(int) $productId,
+                            'message' => 'Produk sudah tidak tersedia atau nonaktif.',
+                        ];
+
+                        continue;
                     }
 
                     $qty = (int) $row['qty'];
                     if ($qty < 1) {
-                        throw new \RuntimeException('Qty tidak valid.');
+                        $checkoutIssues[] = [
+                            'product' => $product->name,
+                            'message' => 'Jumlah pesanan tidak valid.',
+                        ];
+
+                        continue;
                     }
 
                     if ($product->stock < $qty) {
-                        throw new \RuntimeException("Stok tidak cukup untuk produk: {$product->name}. Sisa stok: {$product->stock}.");
+                        $checkoutIssues[] = [
+                            'product' => $product->name,
+                            'message' => 'Stok tersedia hanya '.$product->stock.'.',
+                            'requested' => $qty,
+                            'available' => $product->stock,
+                        ];
+
+                        continue;
                     }
 
                     $subtotal = (float) $product->price * $qty;
@@ -70,6 +89,10 @@ class CheckoutController extends Controller
                         'subtotal' => $subtotal,
                         'store_id' => $product->store_id,
                     ];
+                }
+
+                if ($checkoutIssues !== []) {
+                    throw new CheckoutStockException($checkoutIssues);
                 }
 
                 $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
@@ -106,6 +129,11 @@ class CheckoutController extends Controller
 
                 $request->session()->forget('cart.items');
             }, 3);
+        } catch (CheckoutStockException $e) {
+            return redirect()
+                ->route('checkout.create')
+                ->withInput()
+                ->with('checkoutIssues', $e->issues());
         } catch (Throwable $e) {
             return redirect()
                 ->route('checkout.create')

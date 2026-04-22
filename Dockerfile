@@ -1,23 +1,23 @@
 FROM php:8.3-cli
 
-# Install dependencies sistem + GD
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libzip-dev \
     zip \
     unzip \
     git \
     curl
 
-# Install GD extension
+# GD
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd
 
-# Install extension penting Laravel
-RUN docker-php-ext-install pdo pdo_mysql bcmath
+# ZIP + lainnya
+RUN docker-php-ext-install zip pdo pdo_mysql bcmath
 
-# Install composer
+# composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app

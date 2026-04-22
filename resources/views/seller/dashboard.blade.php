@@ -13,6 +13,16 @@
                     class="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
                     {{ __('Pesanan') }}
                 </a>
+                @if ($hasStore)
+                    <a href="{{ route('seller.reports.sales.index') }}"
+                        class="rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-600">
+                        {{ __('Laporan') }}
+                    </a>
+                    <a href="{{ route('seller.reports.sales.excel') }}"
+                        class="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500">
+                        {{ __('Export Excel') }}
+                    </a>
+                @endif
             </div>
         </div>
     </x-slot>
@@ -36,7 +46,8 @@
                     <div class="text-xs text-gray-500">{{ __('Total Produk') }}</div>
                     <div class="mt-1 text-2xl font-bold text-gray-900">{{ $productsTotal }}</div>
                     <div class="mt-2 text-sm text-gray-600">Aktif: {{ $productsActive }} • Nonaktif:
-                        {{ $productsInactive }}</div>
+                        {{ $productsInactive }}
+                    </div>
                 </div>
                 <div class="rounded-lg bg-white p-6 shadow-sm">
                     <div class="text-xs text-gray-500">{{ __('Total Item Pesanan') }}</div>

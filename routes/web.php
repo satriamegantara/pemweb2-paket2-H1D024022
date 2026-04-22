@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', 'role:penjual'])->prefix('seller')->name(
 
     Route::get('reports/sales', [\App\Http\Controllers\Seller\ReportController::class, 'index'])->name('reports.sales.index');
     Route::get('reports/sales/pdf', [\App\Http\Controllers\Seller\ReportController::class, 'exportPdf'])->name('reports.sales.pdf');
+    Route::get('reports/sales/excel', [\App\Http\Controllers\Seller\ReportController::class, 'exportExcel'])->name('reports.sales.excel');
 });
 
 Route::middleware('auth')->group(function () {

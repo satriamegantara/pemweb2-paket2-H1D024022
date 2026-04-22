@@ -23,7 +23,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 EXPOSE 8080
-CMD php artisan serve --host=0.0.0.0 --port=8080
+CMD php artisan config:clear && php artisan serve --host=0.0.0.0 --port=8080
